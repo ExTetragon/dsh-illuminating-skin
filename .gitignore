@@ -1,0 +1,14 @@
+# dependencies
+node_modules/
+
+# local plugin state / editor backups
+*.bak
+*.bak.*
+_history/
+tmp/
+*.log
+
+# OS cruft
+.DS_Store
+Thumbs.db
+desktop.ini

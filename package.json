@@ -1,0 +1,63 @@
+{
+  "name": "dsh-illuminating-skin",
+  "version": "0.3.0",
+  "description": "IntelliJ IDEA 深色风的 DeepSeek Harness 毛玻璃皮肤：主栏是四周留缝的浮起卡片，左栏整列与窗口标题带连成一块玻璃，标题带中央透出蓝光，设置 / 搜索 / 菜单 / tooltip / toast 等全部浮层统一磨砂。前置要求：必须先安装 dsh-claude-style 并把「配色」设为跟随宿主。纯 CSS 注入，不调用宿主 API。",
+  "keywords": [
+    "dsh-plugin",
+    "deepseek-harness",
+    "theme",
+    "glass",
+    "glassmorphism",
+    "frosted",
+    "frosted-glass",
+    "acrylic",
+    "translucent",
+    "idea",
+    "intellij",
+    "dark"
+  ],
+  "license": "MIT",
+  "author": "dsh-illuminating-skin contributors",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ExTetragon/dsh-illuminating-skin.git"
+  },
+  "homepage": "https://github.com/ExTetragon/dsh-illuminating-skin#readme",
+  "bugs": {
+    "url": "https://github.com/ExTetragon/dsh-illuminating-skin/issues"
+  },
+  "type": "module",
+  "main": "./lib/index.js",
+  "exports": {
+    ".": "./lib/index.js",
+    "./client": "./lib/client.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "lib",
+    "cordis.patch.yml",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE"
+  ],
+  "scripts": {
+    "check": "node --check lib/client.js && node --check lib/index.js"
+  },
+  "peerDependencies": {
+    "dsh-claude-style": ">=0.19.0"
+  },
+  "peerDependenciesMeta": {
+    "dsh-claude-style": {
+      "optional": true
+    }
+  },
+  "dsh": {
+    "bundle": {
+      "patch": "./cordis.patch.yml"
+    },
+    "client": {
+      "inject": [],
+      "platform": "web"
+    }
+  }
+}

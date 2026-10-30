@@ -1,0 +1,13 @@
+# dsh-illuminating-skin bundle layer — registers the HOST half into a profile.
+#
+# The host half is intentionally inert (no route, no tool, no service): all the
+# work happens in the browser half, which appends a single <style> element.
+#
+# The BROWSER half needs no row here: the module loader auto-discovers it from
+# package.json `exports["./client"]` + `dsh.client`.
+#
+# PITFALL: `name` is a PACKAGE NAME (resolved via the profile's node_modules),
+# NOT a relative path.
+- insert:
+    - id: illuminating-skin
+      name: dsh-illuminating-skin

@@ -1,0 +1,7 @@
+# Normalise line endings so the shipped CSS/JS stays byte-identical across platforms.
+* text=auto eol=lf
+*.js text eol=lf
+*.json text eol=lf
+*.yml text eol=lf
+*.md text eol=lf
+*.css text eol=lf
