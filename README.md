@@ -1,6 +1,6 @@
 # dsh-illuminating-skin
 
-**IntelliJ IDEA 深色界面风格的 DeepSeek Harness 毛玻璃皮肤。** 主栏是一条四周留缝的浮起卡片，左栏整列与窗口标题带连成一块玻璃，所有浮层统一磨砂——纯 CSS 注入，不调用宿主任何 API。
+**IntelliJ IDEA 深色界面风格的 DeepSeek Harness 毛玻璃皮肤。** 主栏是一条四周留缝的浮起卡片，左栏整列与窗口标题带连成一块玻璃，所有浮层统一磨砂。以样式注入为主（不调用宿主 API），仅内置一个标题栏发光颜色切换按钮，用原生 DOM 挂进会话头右侧的工具区。
 
 `DSH 0.2.1-rc.5` ｜ `dsh-claude-style >= 0.19.0` ｜ `GPL-3.0`
 
@@ -63,12 +63,37 @@ dsh plugin --profile desktop add link:/absolute/path/to/dsh-illuminating-skin
 | 画布 | 断开宿主的不透明链（`html` / `body` / `#root` / 窗口框架全部透明），`body::before` 自绘中性冷灰光晕衬底 |
 | 侧栏 | 整列（品牌区、导航、工作区树、底部用户区）统一为一块玻璃：内部嵌套面板的背景全部清空，消除上深下浅的色阶断层 |
 | 窗口标题带 | IDEA 式蓝色径向渐变从标题带中央透出，两端收敛回基色；会话标题、原生菜单压在其上不被染色。标题带就是 `body::before` 的顶部切片（高度取宿主变量 `--dsh-windows-titlebar-height`，代码里不写死数字），与左栏同一平面，因此标题带下缘不可能出现接缝 |
+| 顶部发光 | 标题带的光色由单一变量 `--is-glow-rgb` 驱动：标题带中央光晕、卡片缝隙、设置/对话框面板顶光同源联动。会话头右侧有一个色点按钮，提供六套预设与自定义取色，选择写入 `localStorage`，重启后保持 |
 | 主栏卡片 | 会话列是一条距上 4px、右 8px、下 8px、左 4px 的圆角卡片，缝隙直接露出画布玻璃；右栏打开时右边缝隙收到 4px 与左栏对称 |
 | 右栏卡片 | 面板本身即卡片（圆角 + 内侧 .5px 白线），内部 dockkit 拖拽格、better-sidebar 的面板壳全部清零边框与底色；顶部标签行不随内容滚动被压住，滚动区顶部 16px 渐隐 |
 | 路由页 | 插件、插件市场、自动化任务、上下文洞察、记忆系统五页与主栏卡片同参（圆角 16px、内描边 .5px、留缝 4/8/8/4）。五页是两套实现：宿主插件页 / 自动化任务 / 上下文洞察 / 记忆系统是「裁剪壳 + 内部滚动区」，插件市场（dshmarket）是「容器即卡片 + 内部 `body` 滚动」，两者分别处理以保证滚动条落在卡片内 |
 | 浮层 | 设置面板、Ctrl+K 搜索窗口、各类菜单、hover 卡、插件市场源下拉、字体提示 popover、dockkit 浮窗、轨迹轮次预览卡、tooltip、toast 统一为 `blur + 色阶 + 内描边` 的磨砂材质 |
 | 消息气泡 | 发送瞬间的「飞行副本」全程隐藏（claude-style 会先用一个左偏、半透明、无时间戳的副本从输入框位置飞向右侧），按下发送后直接出现最终居右气泡；入场动画换成 220ms 的 `scale(.94)` + 淡入，不再从 `scale(0)` 放大、不再露出消息区深底 |
 | 字体 | 覆盖 `data-dsh-claude-typeface="claude"` 下的 5 个字体栈（`--dsw-font-family` / `--dsh-claude-font-serif` / `-prose` / `-code` / `-brand`），把 dsh-claude-style 指向但包内并不存在的 Anthropic 字体名剔除，消除控制台 3 条 `AnthropicSansWebText.ttf` / `AnthropicMonoWeb.ttf` / `AnthropicSerifWebText.ttf` 404 |
+
+## 顶部发光切换器
+
+会话头右侧（claude-style 给工具区打的 `header-utilities` 标记里，与「…」并排）有一个圆形色点按钮。点开是一块玻璃下拉面板：六套预设 + 一行自定义取色。
+
+| 预设 | 色值 |
+| --- | --- |
+| 黛蓝（默认） | `#4864C1` |
+| 天青 | `#3894BE` |
+| 竹青 | `#3E9E78` |
+| 紫檀 | `#7E5CC4` |
+| 赭石 | `#C47C3E` |
+| 胭脂 | `#C2566E` |
+
+选中的颜色写在 `document.documentElement` 的 `--is-glow-rgb` 上（形如 `72, 100, 193`），并持久化到 `localStorage['dsh-illuminating-skin:glow']`。样式表里所有发光处都用 `rgba(var(--is-glow-rgb, 72, 100, 193), α)` 取色，所以换色不需要改任何规则：
+
+- `body::before` 的标题带中央光晕与卡片缝隙
+- 设置面板、通用对话框的顶部高光
+
+自定义取色用原生 `<input type="color">`，拖动时实时生效，松手即记住。
+
+关闭面板：点面板外部（capture 阶段 `pointerdown`）、按 `Esc`、或再点一次按钮。
+
+> 找不到宿主锚点时按钮不会挂载，插件其余部分照常工作。
 
 ## 配色
 
@@ -142,7 +167,7 @@ claude-style 激活时（`body[data-dsh-claude-style]`）本插件接管它的�
 
 - **强依赖 dsh-claude-style**：见文首前置要求。独立运行会退化。
 - **浮层仍有哈希兜底**：设置遮罩、通用对话框、hovercard、tooltip / toast、轨迹面板、dockkit 浮窗、字体提示、路由页（自动化任务 / 插件市场）仍按哈希匹配。宿主升级后若个别浮层失去磨砂，属于已知情况，需要对照上一节的对照表重新定位——主结构不受影响。0.3.1 已把「插件市场源下拉」与「轨迹预览卡」对齐到 rc.5 的名字。
-- **无运行时逻辑**：本插件不轮询、不监听 DOM、不做布局测量，因此不能自适应宿主新出现的自定义面板。新面板需要单独加规则。
+- **运行时只有切换器**：唯一的 JS 是顶部发光按钮的挂载与重挂（`MutationObserver` 只检查 `isConnected`，不轮询、不做布局测量）。因此不能自适应宿主新出现的自定义面板，新面板需要单独加规则。
 - **浅色主题未实测**：配对了一套浅色取值，但只在深色下验证过。
 
 ## 文件
@@ -151,7 +176,7 @@ claude-style 激活时（`body[data-dsh-claude-style]`）本插件接管它的�
 dsh-illuminating-skin/
 ├── lib/
 │   ├── index.js        # host half，空实现（无路由、无工具、无服务），保证不会拖慢 profile 启动
-│   └── client.js       # browser half，向 document.head 追加一个 <style>；两种模式（claude-style 激活 / 普通 DSH）
+│   └── client.js       # browser half，向 document.head 追加一个 <style>；两种模式（claude-style 激活 / 普通 DSH）；末尾是顶部发光切换器的挂载逻辑
 ├── cordis.patch.yml    # 把 host half 注册进 profile 的 bundle 层
 ├── package.json
 ├── README.md
@@ -165,7 +190,7 @@ dsh-illuminating-skin/
 npm run check    # node --check lib/client.js && node --check lib/index.js
 ```
 
-全部样式都在 `lib/client.js` 里由字符串数组拼成一份 CSS，改完重启桌面端即可看到效果。没有构建步骤、没有依赖、没有 TS。
+全部样式都在 `lib/client.js` 里由字符串数组拼成一份 CSS，运行时逻辑（发光切换器）也在同一文件末尾，改完重启桌面端即可看到效果。没有构建步骤、没有依赖、没有 TS。
 
 ## 许可证
 

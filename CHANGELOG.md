@@ -2,6 +2,25 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.4.0] - 2026-10-30
+
+标题栏发光颜色可切换：光色抽成单一变量，新增会话头右侧的色点按钮。
+
+### 新增
+
+- **顶部发光切换器**：挂进会话头工具区（claude-style 的 `data-dsh-claude-part~="header-utilities"`，与「…」并排）的一个圆形色点按钮，点开为玻璃下拉面板。
+  - 六套预设：黛蓝（默认）/ 天青 / 竹青 / 紫檀 / 赭石 / 胭脂。
+  - 自定义取色：原生 `<input type="color">`，拖动实时生效。
+  - 键盘：`↓` / `Enter` / `Space` 打开，`Esc` 关闭，选项可 `Tab` 遍历。
+  - 持久化：`localStorage['dsh-illuminating-skin:glow']`。
+  - 关闭：点面板外部（capture 阶段 `pointerdown`）或再点一次按钮；不用 `blur`，因为它在选项 click 之前触发。
+- **光色抽成变量**：13 处 `rgba(72,100,193,…)` 与 13 处 `rgba(120,150,228,…)` 统一改为 `rgba(var(--is-glow-rgb, 72, 100, 193), …)`，覆盖 `body::before` 的标题带光晕与卡片缝隙、设置面板与通用对话框的顶部高光。`--is-glow-rgb` 在 `:root` 有兜底值，未运行切换器时观感与 0.3.1 完全一致。
+- **宿主重挂**：`MutationObserver` 监听 `document.body`，只在按钮 `isConnected === false` 时重新插入宿主——不轮询、不做布局测量。
+
+### 兼容
+
+- 仍是 `dsh-claude-style >= 0.19.0` 的叠加层。缺少 claude-style 标记时，按钮依次回退到 `[data-slot="conversation.header"]` 内的 `_headerUtilities` / `_headerActions`；两者都找不到则不挂载，插件其余部分照常工作。
+
 ## [0.3.1] - 2026-10-30
 
 适配 DeepSeek Harness 0.2.1-rc.5，补齐两个一直没对上的浮层选择器。
