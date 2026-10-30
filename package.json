@@ -1,6 +1,6 @@
 {
   "name": "dsh-illuminating-skin",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "description": "IntelliJ IDEA 深色风的 DSH 毛玻璃皮肤：主栏是四周留缝的浮起卡片，左栏整列与窗口标题带连成一块玻璃，设置 / 搜索 / 菜单 / tooltip / toast 等全部浮层统一磨砂；会话头右侧的色点按钮可切换标题带发光颜色（六套预设 + 自定义取色）。前置要求：必须先安装 dsh-claude-style 并把「配色」设为跟随宿主，未安装时主栏卡片、标题带整合与顶部按钮位置会退化。以样式注入为主，不调用宿主 API。",
   "keywords": [
     "dsh-plugin",

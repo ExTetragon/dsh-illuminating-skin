@@ -2,23 +2,29 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
-## [0.4.2] - 2026-10-30
+## [0.4.3] - 2026-10-30
 
-玻璃卡片第二版：消掉五处残留实色，右侧不再丢表格线。
+按实测反馈修正玻璃卡片的材质与残留实色。
 
 ### 修复
 
-- **主栏上下两条灰带**：claude-style 用 `--dsh-claude-fade-stops`（取 `--dsw-alias-bg-base`）画 28px / 40px 的转录区淡出遮罩，铺到玻璃上就是两条 `#151517` 实色带。玻璃模式下把该变量换成与卡片同色的半透明渐变，淡出效果保留、不再显深色。
-- **输入框区实底**：`[data-dsh-claude-part~="composer-seat"]` / `[data-composer-seat]` 背景透明，改由上面那条 40px 渐变过渡。
-- **「深度求索中」sticky 状态条**：claude-style 的 chat-follow 模式给 `[data-chat-running]` 铺 `--dsh-claude-canvas`，玻璃模式下重指为该元素的卡片色。
-- **右栏 tab 条实底**：`[data-dockkit-strip]` / `[class*="tabHost"]` 透明；滚动区顶部遮罩从 16px 拉到 32px，内容不会穿到标签行。
-- **表格最右边竖线消失**：宿主宽表用 `calc(100% + lead + spare)` 加负 margin 往外拉，卡片自身的 margin 让列窄 12px，右缘落到 `overflow:clip` 外被裁。玻璃模式下把 `[data-dsh-claude-part~="table-scroll"]` 与 `.md-table-wide` 钳在列宽内。
+- **透明度**：玻璃底 `.62` → `.84`（浅色 `.88`），与设置面板同档。
+- **上下两条灰条**：claude-style 的转录区淡出遮罩（`--dsh-claude-fade-stops`）原本用 `--dsw-alias-bg-base` 作渐变终点，落在玻璃上就是两条实色横带。改为把该变量置为全透明，两个伪元素都不再绘制。
+- **底部文字穿透**：输入框所在的 `[data-composer-seat]` 改为 `rgba(28,31,38,.55)`（浅色 `rgba(248,249,251,.55)`）——因为它叠在卡片玻璃内部，用低 alpha 就能挡住下方滚动的正文。
+- **「深度求索中」状态条**：`[data-chat-running]` 的 `--dsh-claude-canvas` 直接置为 `transparent`。
+- **表格右缘缺失**：「宽表钳宽」两条规则原本只在玻璃模式生效，现在对所有 claude-style 模式生效——卡片边距让列宽比宿主假定值窄 12px，`table-scroll` 的 0.5px 右边框会掉出裁剪区。
+- **「已编辑 N 个文件」卡片**：宿主 `.HOHHba_card` 用实色 `--dsw-alias-bg-layer-1` + `neutral-850` 标题带，玻璃模式下改为 `rgba(30,33,39,.62)`，标题带透明。
+- **其余宿主容器**：在主栏子树内重映射 `--dsw-alias-bg-layer-1/2/3` 为半透明玻璃色，工具结果卡、文件行等一次性跟随，侧栏/菜单/弹窗不受影响。
 
-### 调整
+## [0.4.2] - 2026-10-30
 
-- **玻璃卡片更透一档**：`.72` → `.62`（浅色 `.72` → `.64`）。
-- **Markdown 实色块玻璃化**：代码块 `--dsw-alias-markdown-code-block`、代码顶栏 `-banner`、表格头 `--dsh-claude-table-head`、行内代码 `--dsh-claude-inline-code-bg` 在玻璃模式下改指半透明色，保留原有深浅顺序（代码体最深、顶栏次之、表头最浅）。
+玻璃模式下的 markdown 表面与右栏细节。
 
+### 修复
+
+- 代码块、代码块标题带、表头、行内代码的四个 token 改为按原深浅顺序排列的半透明玻璃色。
+- 右栏 tab 条透明，滚动区顶部渐隐从 16px 加长到 32px，正文不会穿到标签行上。
+- 「宽表钳宽」首次引入（当时仅玻璃模式生效）。
 ## [0.4.1] - 2026-10-30
 
 颜色菜单新增「玻璃卡片」开关。
