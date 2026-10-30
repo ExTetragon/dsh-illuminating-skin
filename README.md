@@ -2,7 +2,7 @@
 
 **IntelliJ IDEA 深色界面风格的 DeepSeek Harness 毛玻璃皮肤。** 主栏是一条四周留缝的浮起卡片，左栏整列与窗口标题带连成一块玻璃，所有浮层统一磨砂——纯 CSS 注入，不调用宿主任何 API。
 
-`DSH 0.2.1-rc.5` ｜ `dsh-claude-style >= 0.19.0` ｜ `MIT`
+`DSH 0.2.1-rc.5` ｜ `dsh-claude-style >= 0.19.0` ｜ `GPL-3.0`
 
 ---
 
@@ -169,4 +169,4 @@ npm run check    # node --check lib/client.js && node --check lib/index.js
 
 ## 许可证
 
-[MIT](./LICENSE)
+[GPL-3.0](./LICENSE)
