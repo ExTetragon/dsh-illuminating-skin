@@ -2,6 +2,23 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.4.2] - 2026-10-30
+
+玻璃卡片第二版：消掉五处残留实色，右侧不再丢表格线。
+
+### 修复
+
+- **主栏上下两条灰带**：claude-style 用 `--dsh-claude-fade-stops`（取 `--dsw-alias-bg-base`）画 28px / 40px 的转录区淡出遮罩，铺到玻璃上就是两条 `#151517` 实色带。玻璃模式下把该变量换成与卡片同色的半透明渐变，淡出效果保留、不再显深色。
+- **输入框区实底**：`[data-dsh-claude-part~="composer-seat"]` / `[data-composer-seat]` 背景透明，改由上面那条 40px 渐变过渡。
+- **「深度求索中」sticky 状态条**：claude-style 的 chat-follow 模式给 `[data-chat-running]` 铺 `--dsh-claude-canvas`，玻璃模式下重指为该元素的卡片色。
+- **右栏 tab 条实底**：`[data-dockkit-strip]` / `[class*="tabHost"]` 透明；滚动区顶部遮罩从 16px 拉到 32px，内容不会穿到标签行。
+- **表格最右边竖线消失**：宿主宽表用 `calc(100% + lead + spare)` 加负 margin 往外拉，卡片自身的 margin 让列窄 12px，右缘落到 `overflow:clip` 外被裁。玻璃模式下把 `[data-dsh-claude-part~="table-scroll"]` 与 `.md-table-wide` 钳在列宽内。
+
+### 调整
+
+- **玻璃卡片更透一档**：`.72` → `.62`（浅色 `.72` → `.64`）。
+- **Markdown 实色块玻璃化**：代码块 `--dsw-alias-markdown-code-block`、代码顶栏 `-banner`、表格头 `--dsh-claude-table-head`、行内代码 `--dsh-claude-inline-code-bg` 在玻璃模式下改指半透明色，保留原有深浅顺序（代码体最深、顶栏次之、表头最浅）。
+
 ## [0.4.1] - 2026-10-30
 
 颜色菜单新增「玻璃卡片」开关。
