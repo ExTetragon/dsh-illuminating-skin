@@ -2,6 +2,25 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.3.1] - 2026-10-30
+
+适配 DeepSeek Harness 0.2.1-rc.5，补齐两个一直没对上的浮层选择器。
+
+### 适配复查
+
+- **宿主哈希未变**：rc.5 的 CSS module 前缀与 rc.3 完全一致（`mP3x-q_*` / `an3WzG_*` / `acoR2W_*` / `AnXs9G_*` / `olCj9W_*` / `V7pFBG_*` / `F07MqG_*` / `eze_pW_*`），主结构无需改动。
+- **稳定锚点仍在**：`data-slot` / `data-conversation-content` / `data-phase` / `data-dockkit-*` / `data-sidebar-right-panel` / `data-shortcut-modal` 全部存在；claude-style 0.19.5 的 160 个 `data-dsh-claude-part` 值也未变。
+- **第三方包哈希未变**：`IIa07q_shell`（dsh-mnemon 0.5.36）、`nUhMVa_panelHost`（dshmarket 1.70.2）、`bdiHEa_paneBody` / `nArs4W_paneCard`（dsh-better-sidebar 0.28.2）。
+- **实机像素复核**：主栏卡片圆角、四周缝隙与内描边、左栏玻璃、标题带蓝光均正常（缝隙 `(50,54,67)`、卡片 `(21,21,23)`、标题带峰值 `(55,68,107)`）。
+
+### 修复
+
+- 插件市场「源」下拉与轨迹轮次预览卡此前一直是纯实色板——选择器在 rc.3 就已失效，这次重新定位：
+  - `fO69Vq_registry` → `V7pFBG_registry`（随插件市场页前缀一起变成 `V7pFBG_`）
+  - `xpvNua_preview` → `SNx2jG_preview`（轨迹模块换了哈希前缀）
+
+  两处连同 `prefers-reduced-transparency` 降级块一并更新。
+
 ## [0.3.0] - 2026-10-30
 
 首个公开发布版，适配 DeepSeek Harness 0.2.1-rc.3 / dsh-claude-style 0.19.5。

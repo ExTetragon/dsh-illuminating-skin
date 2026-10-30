@@ -2,7 +2,7 @@
 
 **IntelliJ IDEA 深色界面风格的 DeepSeek Harness 毛玻璃皮肤。** 主栏是一条四周留缝的浮起卡片，左栏整列与窗口标题带连成一块玻璃，所有浮层统一磨砂——纯 CSS 注入，不调用宿主任何 API。
 
-`DSH 0.2.1-rc.3` ｜ `dsh-claude-style >= 0.19.0` ｜ `MIT`
+`DSH 0.2.1-rc.5` ｜ `dsh-claude-style >= 0.19.0` ｜ `MIT`
 
 ---
 
@@ -120,6 +120,13 @@ claude-style 激活时（`body[data-dsh-claude-style]`）本插件接管它的�
 | 字体提示浮层 | `_VovcG_panel` | `eze_pW_panel` |
 | tooltip 气泡 | `_bubble_12mhf` | `_bubble_44yfq` |
 
+**rc.3 → rc.5 复查（2026-10-30）**：宿主与第三方包的 CSS module 哈希**一个都没变**（rc.5 仍是 `mP3x-q_*` / `an3WzG_*` / `acoR2W_*` / `AnXs9G_*` / `olCj9W_*` / `V7pFBG_*` / `F07MqG_*` / `eze_pW_*`），`data-slot` / `data-dsh-claude-part` / `data-dockkit-*` 等锚点也全部存在，主结构无需改动。只有两个浮层的类名在 rc.3 时就已经换掉、此前一直没对上：
+
+| 浮层 | 0.3.0 里写的（失效） | 0.3.1 |
+| --- | --- | --- |
+| 插件市场「源」下拉 | `fO69Vq_registry` | `V7pFBG_registry` |
+| 轨迹轮次预览卡 | `xpvNua_preview` | `SNx2jG_preview` |
+
 第三方包的哈希**不随宿主升级变**（`IIa07q_shell` = dsh-mnemon、`nUhMVa_panelHost` = dshmarket、`bdiHEa_paneBody` / `nArs4W_paneCard` = dsh-better-sidebar），可以放心用。
 
 ## 六个必须记住的坑
@@ -129,12 +136,12 @@ claude-style 激活时（`body[data-dsh-claude-style]`）本插件接管它的�
 3. **按类名后缀匹配 header 会连带命中 6 个子类**（`headerActions` / `headerUtilities` / `headerCorner` / `headerLeading` / `headerSessionless` / `headerBlank`），给 header 上玻璃必须逐个 `:not()` 排除，否则标题栏里的按钮会被各涂一层。0.3.0 改用 `[data-slot="conversation.header"] > *` 从根上避开了这个问题。同理，哈希类名用 `class~=` 精确匹配，别用 `class*=`。
 4. **留缝不能用 margin 或 padding**：列上的 margin 会压缩它内部含会话头的子元素、把 chips 裁掉；右栏改用 `border-*-color: transparent` + `background-clip: padding-box` 才能在不移动内容盒的前提下留出玻璃缝。路由页根带 `width:100%` 时必须补 `width:auto`，否则 margin 会把盒子推出窗口右缘、滚动条跑到卡片外。
 5. **`[data-dsh-claude-send-flight]{visibility:hidden}` 是 claude-style 的原意**，不是 bug：它藏住的正是那个飞行副本。曾经反过来改成 `visible` 试图「别露底」，结果副本反而更显眼。要消掉中间态就继续隐藏副本（本插件隐藏 `[data-dsh-claude-send-ghost]` 与 `.dsh-claude-enter-bubble/-card`），并保留 `visibility/opacity` 而**不要**用 `display:none`——后者会掐断动画链，真气泡接管时可能不出现。
-6. **CSS module 哈希类名会随宿主升级整体变掉**。DSH 从 0.2.1-rc.2 → rc.3 时三十多个类名全部重建，按哈希写死的选择器一次性全失效——表现就是「主栏圆角卡片忽然没了」。现在主结构一律改用属性锚点，哈希只留给浮层兜底。
+6. **CSS module 哈希类名会随宿主升级整体变掉**（rc.3 → rc.5 这次恰好没变，但不能指望下次也不变，每次升级都要复查）。DSH 从 0.2.1-rc.2 → rc.3 时三十多个类名全部重建，按哈希写死的选择器一次性全失效——表现就是「主栏圆角卡片忽然没了」。现在主结构一律改用属性锚点，哈希只留给浮层兜底。
 
 ## 已知限制
 
 - **强依赖 dsh-claude-style**：见文首前置要求。独立运行会退化。
-- **浮层仍有哈希兜底**：设置遮罩、通用对话框、hovercard、tooltip / toast、轨迹面板、dockkit 浮窗、字体提示、路由页（自动化任务 / 插件市场）仍按哈希匹配。宿主升级后若个别浮层失去磨砂，属于已知情况，需要对照上一节的对照表重新定位——主结构不受影响。
+- **浮层仍有哈希兜底**：设置遮罩、通用对话框、hovercard、tooltip / toast、轨迹面板、dockkit 浮窗、字体提示、路由页（自动化任务 / 插件市场）仍按哈希匹配。宿主升级后若个别浮层失去磨砂，属于已知情况，需要对照上一节的对照表重新定位——主结构不受影响。0.3.1 已把「插件市场源下拉」与「轨迹预览卡」对齐到 rc.5 的名字。
 - **无运行时逻辑**：本插件不轮询、不监听 DOM、不做布局测量，因此不能自适应宿主新出现的自定义面板。新面板需要单独加规则。
 - **浅色主题未实测**：配对了一套浅色取值，但只在深色下验证过。
 
