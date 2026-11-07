@@ -2,6 +2,19 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.4.6] - 2026-11-07
+
+适配 DSH 0.2.2 的会话头结构，并补上输入框被第三方插件隐藏时的兜底。
+
+### 新增
+
+- **输入框守卫（composer seat guard）**：监视宿主自己的 `[data-composer-seat]`，记住宿主在可见状态下给它的 `display`，一旦被别的插件算成 `none`，就用内联 `!important` 还原并打一条 `console.warn`。起因是 dsh-claude-style 0.19.6 只用「`[data-conversation-tabs]` 里第一个 `[role="tab"]` 是否 `aria-selected`」判断当前是不是对话视图，而宿主 0.2.2 把「对话」固定在第一，于是任何非对话视图（例如阅读视图）都会被判成仅检视、整块隐藏输入框。守卫不点名对方的任何属性：宿主换了 display 值它跟着走，对方改了属性名它就自动不再触发。
+
+### 修复
+
+- **会话头按钮只剩上半缘**：宿主 0.2.2 把 `headerActions` 挂进了 `titleCluster`，而本皮肤早先为了让 team / PTC chips 避开卡片上缘给它加过 `top:22px`，按钮被推到 `titleCluster` 的裁剪窗口之外。只加 `overflow:visible` 不够——元素带 `mask-image` 时 Chrome 的 `mask-clip` 默认是 `border-box`，溢出内容同样会被 mask 的绘制区域裁掉（视觉不可见、`elementFromPoint` 会穿透到 `header`）。改为同时清掉该节点的 `overflow` 与 `mask-image`；标题横条早已由 claude-style 固定到系统标题栏，去掉这个横向淡出没有视觉损失。
+- **bili 上游不可用横幅**：`[data-shell-overlay]` 里带 `rgba(217,63,11,…)` 内联橙色的 `[role="status"]` 会盖住页面，已隐藏（覆盖有空格与无空格两种序列化形式）。
+
 ## [0.4.5] - 2026-10-30
 
 颜色菜单里的开关名称改为「彩色卡片」。
