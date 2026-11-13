@@ -96,6 +96,19 @@ dsh plugin --profile desktop add link:/absolute/path/to/dsh-illuminating-skin
 
 > 找不到宿主锚点时按钮不会挂载，插件其余部分照常工作。
 
+### 主题切换
+
+面板最下方一行「主题」，右侧 pill 显示当前偏好，点击三态循环：
+
+| 当前 | 点击后 |
+| --- | --- |
+| 跟随系统 | 按当前实际外观取反并固化（系统是深色时第一次点击 → 浅色） |
+| 浅色 | 深色 |
+| 深色 | 跟随系统 |
+
+写的是宿主的主题偏好（`ctx.theme.setTheme()`），所以原生标题栏、菜单、claude-style 的配色会一起变；偏好本身由宿主持久化，插件不另存一份。宿主在别处改了偏好时（例如设置面板或系统主题），pill 通过 MutationObserver 观察 `body[data-ds-dark-theme]` 自动同步文案。
+
+> `ctx.theme` 是 cordis 服务，插件必须先声明才能访问，所以 `lib/client.js` 的 factory 返回值里带了 `inject: ["theme"]`，`package.json` 的 `dsh.client.inject` 也同步声明。
 ### 彩色卡片开关
 
 同一面板底部还有一行「彩色卡片」开关。开启后，主栏与右栏从「透出背景的磨砂玻璃」换成一块**平铺的混合色**——不再采样页面背景，也不做模糊：
