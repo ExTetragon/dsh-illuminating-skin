@@ -2,7 +2,7 @@
 
 **IntelliJ IDEA 深色界面风格的 DeepSeek Harness 毛玻璃皮肤。** 主栏是一条四周留缝的浮起卡片，左栏整列与窗口标题带连成一块玻璃，所有浮层统一磨砂。以样式注入为主（不调用宿主 API），仅内置一个标题栏发光颜色切换按钮，用原生 DOM 挂进会话头右侧的工具区。
 
-`DSH 0.2.1-rc.5` ｜ `dsh-claude-style >= 0.19.0` ｜ `GPL-3.0`
+`DSH 0.2.2-rc.1` ｜ `dsh-claude-style >= 0.19.0` ｜ `GPL-3.0`
 
 ---
 
@@ -198,12 +198,22 @@ claude-style 激活时（`body[data-dsh-claude-style]`）本插件接管它的�
 3. **按类名后缀匹配 header 会连带命中 6 个子类**（`headerActions` / `headerUtilities` / `headerCorner` / `headerLeading` / `headerSessionless` / `headerBlank`），给 header 上玻璃必须逐个 `:not()` 排除，否则标题栏里的按钮会被各涂一层。0.3.0 改用 `[data-slot="conversation.header"] > *` 从根上避开了这个问题。同理，哈希类名用 `class~=` 精确匹配，别用 `class*=`。
 4. **留缝不能用 margin 或 padding**：列上的 margin 会压缩它内部含会话头的子元素、把 chips 裁掉；右栏改用 `border-*-color: transparent` + `background-clip: padding-box` 才能在不移动内容盒的前提下留出玻璃缝。路由页根带 `width:100%` 时必须补 `width:auto`，否则 margin 会把盒子推出窗口右缘、滚动条跑到卡片外。
 5. **`[data-dsh-claude-send-flight]{visibility:hidden}` 是 claude-style 的原意**，不是 bug：它藏住的正是那个飞行副本。曾经反过来改成 `visible` 试图「别露底」，结果副本反而更显眼。要消掉中间态就继续隐藏副本（本插件隐藏 `[data-dsh-claude-send-ghost]` 与 `.dsh-claude-enter-bubble/-card`），并保留 `visibility/opacity` 而**不要**用 `display:none`——后者会掐断动画链，真气泡接管时可能不出现。
+**rc.5 → 0.2.2-rc.1 复查（2026-11-14）**：主结构哈希（`mP3x-q_*` / `an3WzG_*` / `acoR2W_*` / `AnXs9G_*` / `olCj9W_*` / `V7pFBG_*` / `F07MqG_*` / `eze_pW_*`）与 `data-*` 锚点全部未变，五个浮层的哈希改名，0.4.7 已对齐：
+
+| 组件 | 0.2.1-rc.5 | 0.2.2-rc.1 |
+|---|---|---|
+| hovercard | `_card_38jqx` | `_card_bgejw` |
+| toast | `_toast_l6cvn` | `_toast_hr9yd` |
+| 通用对话框 | `_dialog_o6lrb` | `_dialog_14mp3` |
+| 对话框遮罩 | `_mask_o6lrb` | `_mask_14mp3` |
+| dockkit 浮窗 | `_float_6nhg2` | `_float_3oazc` |
+
 6. **CSS module 哈希类名会随宿主升级整体变掉**（rc.3 → rc.5 这次恰好没变，但不能指望下次也不变，每次升级都要复查）。DSH 从 0.2.1-rc.2 → rc.3 时三十多个类名全部重建，按哈希写死的选择器一次性全失效——表现就是「主栏圆角卡片忽然没了」。现在主结构一律改用属性锚点，哈希只留给浮层兜底。
 
 ## 已知限制
 
 - **强依赖 dsh-claude-style**：见文首前置要求。独立运行会退化。
-- **浮层仍有哈希兜底**：设置遮罩、通用对话框、hovercard、tooltip / toast、轨迹面板、dockkit 浮窗、字体提示、路由页（自动化任务 / 插件市场）仍按哈希匹配。宿主升级后若个别浮层失去磨砂，属于已知情况，需要对照上一节的对照表重新定位——主结构不受影响。0.3.1 已把「插件市场源下拉」与「轨迹预览卡」对齐到 rc.5 的名字。
+- **浮层仍有哈希兜底**：设置遮罩、通用对话框、hovercard、tooltip / toast、轨迹面板、dockkit 浮窗、字体提示、路由页（自动化任务 / 插件市场）仍按哈希匹配。宿主升级后若个别浮层失去磨砂，属于已知情况，需要对照上一节的对照表重新定位——主结构不受影响。0.3.1 已把「插件市场源下拉」与「轨迹预览卡」对齐到 rc.5 的名字，0.4.7 又把五个浮层对齐到 0.2.2-rc.1 的名字。
 - **运行时只有切换器**：唯一的 JS 是顶部发光按钮的挂载与重挂（`MutationObserver` 只检查 `isConnected`，不轮询、不做布局测量）。因此不能自适应宿主新出现的自定义面板，新面板需要单独加规则。
 - **浅色主题未实测**：配对了一套浅色取值，但只在深色下验证过。
 - **彩色卡片是平涂色**：卡片不采样背景，侧栏玻璃的侧光不会渗进主栏，卡片左右两段观感一致；代价是没有「透出壁纸」的层次，只剩主题色调。要改明度调混合基色，要改色相调 `--is-card-tint`。

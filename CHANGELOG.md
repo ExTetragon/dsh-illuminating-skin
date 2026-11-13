@@ -2,6 +2,15 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.4.7] - 2026-11-14
+
+适配 DSH 0.2.2-rc.1：五个浮层的 CSS module 哈希改名已逐个对齐，输入框守卫补上只在对话标签页生效与防抖动逻辑。
+
+### 变更
+
+- 浮层哈希更新：`_card_38jqx`→`_card_bgejw`、`_toast_l6cvn`→`_toast_hr9yd`、`_dialog_o6lrb`→`_dialog_14mp3`、`_mask_o6lrb`→`_mask_14mp3`、`_float_6nhg2`→`_float_3oazc`。
+- 输入框守卫新增 `onChatTab()` 判定与「已生效就不再 release/force」的防抖动，避免非对话视图强制显示输入框、以及每轮采样造成的闪烁。
+
 ## [0.4.6] - 2026-11-07
 
 适配 DSH 0.2.2 的会话头结构，并补上输入框被第三方插件隐藏时的兜底。
