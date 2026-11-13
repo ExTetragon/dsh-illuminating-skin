@@ -165,7 +165,7 @@ claude-style 激活时（`body[data-dsh-claude-style]`）本插件接管它的�
 
 ## 选择器策略
 
-宿主每次升级都会重建 CSS module 哈希，所以新写规则请按下面的优先级挑锚点：
+0.4.9 起，插件对**宿主元素已没有任何硬编码哈希类名**——所有浮层和面板都改用宿主自己的语义属性（`data-*`、`role`、内联自定义属性）。下面两张表：先是选锚点的稳定性优先级，再是当前实际使用的锚点清单。
 
 | 锚点 | 例 | 稳定性 |
 | --- | --- | --- |
@@ -173,11 +173,33 @@ claude-style 激活时（`body[data-dsh-claude-style]`）本插件接管它的�
 | 宿主语义属性 | `[data-conversation-content]` / `[data-phase]` / `[data-sidebar-right-open]` / `[data-sidebar-right-panel]` / `[data-pane="conversation"]` / `[data-shortcut-modal="settings"]` / `data-dockkit-*` | 很稳 |
 | claude-style 标记 | `[data-dsh-claude-part~="center-column"]`（另有 160 个值：sidebar-column / layout-frame / conversation-header / header-actions / composer-seat / …） | 稳（claude-style 承诺的契约） |
 | 类名后缀 | `[class*="_centerCol"]` / `[class*="_sidebarCol"]` | 中（后缀名通常不随哈希变） |
-| 完整哈希类名 | `[class*="an3WzG_root"]` | 差（每次宿主升级都要重查） |
+| 完整哈希类名 | `[class*="an3WzG_root"]` | 差（宿主升级必失效；0.4.9 起本插件已无此类选择器） |
 
 **注意**：`[data-slot="..."]` 包装元素是 `display:contents`（不生成盒子），**不能**在上面画 `background` / `::before`，只能作为 `:has()` / 后代选择器的匹配目标。
 
-### rc.2 → rc.3 哈希对照（维护参考）
+### 属性锚点清单（0.4.9 起实际使用）
+
+| 元素 | 锚点 |
+| --- | --- |
+| 设置遮罩 | `div:has(> [data-shortcut-modal="settings"]) > [aria-hidden="true"]` |
+| 通用对话框遮罩 | `div[role="presentation"] > [aria-hidden="true"]` |
+| 通用对话框面板 | `div[role="presentation"] > [role="dialog"][aria-modal="true"]:not([data-shortcut-modal])` |
+| 复制/链接悬浮卡 | `[style*="--dsh-hover-preview-fade"]` |
+| Tooltip | `[role="tooltip"][data-side]` |
+| Toast | `[style*="--dsh-toast-hold"]` |
+| 插件市场「源」下拉 | `[data-install-registry]` |
+| 字体缺失提示浮层 | `[role="dialog"]:not([aria-modal="true"])` |
+| dockkit 浮窗 | `[data-dockkit-float]` |
+| 轨迹轮次预览卡 | `[role="tooltip"]:not([data-side])` |
+| 发送队列 dock | `[data-queue-dock]`（面板 = 第一个 `div` 子元素） |
+| 自动化任务页 | `[data-testid="task-manager-page"]` |
+| 插件管理 / 插件市场页 | `[data-plugin-panel]` |
+| 「已编辑 N 个文件」卡 | `[data-changed-files]`（header 是它的直接子 `button`） |
+| 思考块 | `[data-variant="think"]` |
+
+> `[role="dialog"]:not([aria-modal="true"])` 之所以能精确命中字体提示浮层：DSH 里只有三处 `role="dialog"`——通用对话框与图片查看器都带 `aria-modal="true"`，只有这个非模态浮层不带。
+
+### rc.2 → rc.3 哈希对照（历史参考，0.4.9 起不再使用）
 
 | 组件 | rc.2 | rc.3 |
 | --- | --- | --- |
@@ -221,12 +243,12 @@ claude-style 激活时（`body[data-dsh-claude-style]`）本插件接管它的�
 | 对话框遮罩 | `_mask_o6lrb` | `_mask_14mp3` |
 | dockkit 浮窗 | `_float_6nhg2` | `_float_3oazc` |
 
-6. **CSS module 哈希类名会随宿主升级整体变掉**（rc.3 → rc.5 这次恰好没变，但不能指望下次也不变，每次升级都要复查）。DSH 从 0.2.1-rc.2 → rc.3 时三十多个类名全部重建，按哈希写死的选择器一次性全失效——表现就是「主栏圆角卡片忽然没了」。现在主结构一律改用属性锚点，哈希只留给浮层兜底。
+6. **CSS module 哈希类名会随宿主升级整体变掉**。DSH 从 0.2.1-rc.2 → rc.3 时三十多个类名全部重建，按哈希写死的选择器一次性全失效——表现就是「主栏圆角卡片忽然没了」。0.4.9 已把**全部宿主侧哈希**换成属性锚点（`data-*` / `role` / `style*=`），只保留第三方包前缀与语义后缀类名，宿主升级不再需要逐个重查。
 
 ## 已知限制
 
 - **强依赖 dsh-claude-style**：见文首前置要求。独立运行会退化。
-- **浮层仍有哈希兜底**：设置遮罩、通用对话框、hovercard、tooltip / toast、轨迹面板、dockkit 浮窗、字体提示、路由页（自动化任务 / 插件市场）仍按哈希匹配。宿主升级后若个别浮层失去磨砂，属于已知情况，需要对照上一节的对照表重新定位——主结构不受影响。0.3.1 已把「插件市场源下拉」与「轨迹预览卡」对齐到 rc.5 的名字，0.4.7 又把五个浮层对齐到 0.2.2-rc.1 的名字。
+- **宿主升级后不再需要重查哈希**：0.4.9 起所有宿主元素都按语义属性定位（清单见「属性锚点清单」），DSH 升级不会再让浮层或卡片掉材质。仍带类名的只有第三方包（`IIa07q_shell` = dsh-mnemon、`nUhMVa_panelHost` = dshmarket、`bdiHEa_paneBody` / `nArs4W_paneCard` = dsh-better-sidebar）与语义后缀（`_centerCol` / `_sidebarCol` / `_frame` / `paneBody` 等）；前者由第三方包自己维护、版本锁定，后者后缀名不随哈希变。
 - **运行时只有切换器**：唯一的 JS 是顶部发光按钮的挂载与重挂（`MutationObserver` 只检查 `isConnected`，不轮询、不做布局测量）。因此不能自适应宿主新出现的自定义面板，新面板需要单独加规则。
 - **浅色主题未实测**：配对了一套浅色取值，但只在深色下验证过。
 - **彩色卡片是平涂色**：卡片不采样背景，侧栏玻璃的侧光不会渗进主栏，卡片左右两段观感一致；代价是没有「透出壁纸」的层次，只剩主题色调。要改明度调混合基色，要改色相调 `--is-card-tint`。

@@ -2,6 +2,17 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.4.9] - 2026-11-14
+
+把最后一批宿主侧硬编码 CSS module 哈希全部换成宿主语义属性锚点，DSH 升级不再需要逐个重查浮层类名。
+
+### 变更
+
+- 浮层锚点：设置遮罩改用 `div:has(> [data-shortcut-modal="settings"]) > [aria-hidden="true"]`（删掉冗余的哈希分支）；通用对话框遮罩/面板改用 `div[role="presentation"] > [aria-hidden="true"]` 与 `div[role="presentation"] > [role="dialog"][aria-modal="true"]:not([data-shortcut-modal])`；复制/链接悬浮卡用 `[style*="--dsh-hover-preview-fade"]`；Tooltip 用 `[role="tooltip"][data-side]`；Toast 用 `[style*="--dsh-toast-hold"]`。
+- 面板锚点：插件市场「源」下拉 → `[data-install-registry]`；字体缺失提示 → `[role="dialog"]:not([aria-modal="true"])`；dockkit 浮窗 → `[data-dockkit-float]`；轨迹轮次预览卡 → `[role="tooltip"]:not([data-side])`；发送队列 dock → `[data-queue-dock]`；自动化任务页 → `[data-testid="task-manager-page"]`；插件管理/市场页 → `[data-plugin-panel]`；「已编辑 N 个文件」卡 → `[data-changed-files]`；思考块 → `[data-variant="think"]`。
+- 会话列根删掉 `[class*="an3WzG_root"]` 并列分支，统一走 `[data-dsh-claude-part~="center-column"] [data-phase]:has(> [data-slot="conversation.content"])`。
+- README 新增「属性锚点清单」；「六个坑」第 6 条与「已知限制」同步改写。
+
 ## [0.4.8] - 2026-11-14
 
 外观菜单最下方新增主题切换，可在浅色 / 深色 / 跟随系统之间循环。
