@@ -161,7 +161,7 @@ dsh plugin --profile desktop add link:/absolute/path/to/dsh-illuminating-skin
 
 本插件**不占用** `html[data-dsh-skin]`，所以皮肤中心不会触发「交接让路」；同时所有规则都带 `html:not([data-dsh-skin])` 守卫，皮肤中心启用任何 scoped 皮肤时本插件自动退让，不会出现两套画布叠加。
 
-claude-style 激活时（`body[data-dsh-claude-style]`）本插件接管它的画布变量（`--dsh-claude-canvas` / `--dsh-claude-sidebar-canvas` / `--dsw-specific-sidebar-fill`），**不碰** position / backdrop-filter，因此它的「会话标题进入窗口标题栏」布局原样保留；会话列卡片则是在它重排后的会话列根（带 `data-phase`、子树含 `[data-slot="conversation.content"]` 的那一层）上再叠一层盒子。
+claude-style 激活时（`body[data-dsh-claude-style]`）本插件接管它的画布变量（`--dsh-claude-canvas` / `--dsh-claude-sidebar-canvas` / `--dsw-specific-sidebar-fill`），**不碰** position / backdrop-filter，因此它的「会话标题进入窗口标题栏」布局原样保留；会话列卡片则是在它重排后的会话列根（带 `data-phase`、直接子含 `[data-slot="conversation.header"]` 的那一层）上再叠一层盒子。
 
 ## 选择器策略
 
@@ -196,6 +196,7 @@ claude-style 激活时（`body[data-dsh-claude-style]`）本插件接管它的�
 | 插件管理 / 插件市场页 | `[data-plugin-panel]` |
 | 「已编辑 N 个文件」卡 | `[data-changed-files]`（header 是它的直接子 `button`） |
 | 思考块 | `[data-variant="think"]` |
+| 会话列根（主栏卡片） | `[data-dsh-claude-part~="center-column"] [data-phase]:has(> [data-slot="conversation.header"])` |
 
 > `[role="dialog"]:not([aria-modal="true"])` 之所以能精确命中字体提示浮层：DSH 里只有三处 `role="dialog"`——通用对话框与图片查看器都带 `aria-modal="true"`，只有这个非模态浮层不带。
 
@@ -226,13 +227,18 @@ claude-style 激活时（`body[data-dsh-claude-style]`）本插件接管它的�
 
 第三方包的哈希**不随宿主升级变**（`IIa07q_shell` = dsh-mnemon、`nUhMVa_panelHost` = dshmarket、`bdiHEa_paneBody` / `nArs4W_paneCard` = dsh-better-sidebar），可以放心用。
 
-## 六个必须记住的坑
+## 七个必须记住的坑
 
 1. **`backdrop-filter` 会创建 containing block**：给侧栏列加模糊后，宿主 `[data-windows-titlebar]` 下 `position: fixed; left: 12px` 的收起按钮会被重锚定、跑到视口外。所以玻璃一律画在 `::before` 伪元素上，列本身保持 transparent。
 2. **`box-shadow` 不接受渐变**：claude-style 用 `box-shadow: 0 -52px 0 0 <canvas>` 把两列背景刷进标题带，因此那两个变量必须是纯色。当前实现直接把这层阴影去掉，把标题带交还给 `body::before`。
 3. **按类名后缀匹配 header 会连带命中 6 个子类**（`headerActions` / `headerUtilities` / `headerCorner` / `headerLeading` / `headerSessionless` / `headerBlank`），给 header 上玻璃必须逐个 `:not()` 排除，否则标题栏里的按钮会被各涂一层。0.3.0 改用 `[data-slot="conversation.header"] > *` 从根上避开了这个问题。同理，哈希类名用 `class~=` 精确匹配，别用 `class*=`。
 4. **留缝不能用 margin 或 padding**：列上的 margin 会压缩它内部含会话头的子元素、把 chips 裁掉；右栏改用 `border-*-color: transparent` + `background-clip: padding-box` 才能在不移动内容盒的前提下留出玻璃缝。路由页根带 `width:100%` 时必须补 `width:auto`，否则 margin 会把盒子推出窗口右缘、滚动条跑到卡片外。
 5. **`[data-dsh-claude-send-flight]{visibility:hidden}` 是 claude-style 的原意**，不是 bug：它藏住的正是那个飞行副本。曾经反过来改成 `visible` 试图「别露底」，结果副本反而更显眼。要消掉中间态就继续隐藏副本（本插件隐藏 `[data-dsh-claude-send-ghost]` 与 `.dsh-claude-enter-bubble/-card`），并保留 `visibility/opacity` 而**不要**用 `display:none`——后者会掐断动画链，真气泡接管时可能不出现。
+
+6. **CSS module 哈希类名会随宿主升级整体变掉**。DSH 从 0.2.1-rc.2 → rc.3 时三十多个类名全部重建，按哈希写死的选择器一次性全失效——表现就是「主栏圆角卡片忽然没了」。0.4.9 已把**全部宿主侧哈希**换成属性锚点（`data-*` / `role` / `style*=`），只保留第三方包前缀与语义后缀类名，宿主升级不再需要逐个重查。
+
+7. **`data-slot` 的名字会随宿主重构改名，判会话根要用常驻的那个**。0.2.2-rc.1 把会话主体 slot 从 `conversation.content` 改成了 `main` / `main.conversation`，于是 `:has(> [data-slot="conversation.content"])` 整条判空——表现同样是「主栏圆角卡片忽然没了」（0.4.9 引入，0.4.10 修）。改用常驻的 `:has(> [data-slot="conversation.header"])`：header slot 在无会话时也存在，并且能排除另一个同样带 `[data-phase]` 的元素（输入框）。
+
 **rc.5 → 0.2.2-rc.1 复查（2026-11-14）**：主结构哈希（`mP3x-q_*` / `an3WzG_*` / `acoR2W_*` / `AnXs9G_*` / `olCj9W_*` / `V7pFBG_*` / `F07MqG_*` / `eze_pW_*`）与 `data-*` 锚点全部未变，五个浮层的哈希改名，0.4.7 已对齐：
 
 | 组件 | 0.2.1-rc.5 | 0.2.2-rc.1 |
@@ -242,8 +248,6 @@ claude-style 激活时（`body[data-dsh-claude-style]`）本插件接管它的�
 | 通用对话框 | `_dialog_o6lrb` | `_dialog_14mp3` |
 | 对话框遮罩 | `_mask_o6lrb` | `_mask_14mp3` |
 | dockkit 浮窗 | `_float_6nhg2` | `_float_3oazc` |
-
-6. **CSS module 哈希类名会随宿主升级整体变掉**。DSH 从 0.2.1-rc.2 → rc.3 时三十多个类名全部重建，按哈希写死的选择器一次性全失效——表现就是「主栏圆角卡片忽然没了」。0.4.9 已把**全部宿主侧哈希**换成属性锚点（`data-*` / `role` / `style*=`），只保留第三方包前缀与语义后缀类名，宿主升级不再需要逐个重查。
 
 ## 已知限制
 

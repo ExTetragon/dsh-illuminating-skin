@@ -2,6 +2,15 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.4.10] - 2026-11-14
+
+修复 0.4.9 引入的回归：主栏圆角卡片整体消失。
+
+### 修复
+
+- 0.2.2-rc.1 把会话主体 slot 从 `conversation.content` 改成了 `main` / `main.conversation`，0.4.9 删掉哈希并列分支后，`[data-dsh-claude-part~="center-column"] [data-phase]:has(> [data-slot="conversation.content"])` 整条判空，会话列的圆角/留缝/内描边/裁剪一起失效。
+- 判定改用常驻的 `:has(> [data-slot="conversation.header"])`（5 处），header slot 在无会话时也存在，并能排除另一个带 `[data-phase]` 的输入框。
+- README 的锚点清单与「坑」列表同步：新增第 7 条说明 slot 名会随宿主重构改名。
 ## [0.4.9] - 2026-11-14
 
 把最后一批宿主侧硬编码 CSS module 哈希全部换成宿主语义属性锚点，DSH 升级不再需要逐个重查浮层类名。
@@ -21,6 +30,7 @@
 
 - **主题切换**：面板底部一行「主题」，pill 显示当前偏好，点击按 跟随系统 → 浅色 → 深色 → 跟随系统 循环；从「跟随系统」进入时按当前实际外观取反并固化。走宿主 `ctx.theme.setTheme()`，原生标题栏与 claude-style 配色一起跟随。
 - `lib/client.js` 的 factory 返回值补上 `inject: ["theme"]`（cordis 要求先声明才能访问服务，否则整个切换器挂载失败）。
+
 ## [0.4.7] - 2026-11-14
 
 适配 DSH 0.2.2-rc.1：五个浮层的 CSS module 哈希改名已逐个对齐，输入框守卫补上只在对话标签页生效与防抖动逻辑。
