@@ -2,6 +2,23 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.4.15] - 2026-11-14
+
+全面检查后清理冗余叠层、修正两处监听问题。
+
+### 修复
+
+- **主栏卡片描边画了三层**：会话根节点、中栏 `::before`、中栏 `::after`（彩色卡片）各有一圈 0.5px 内描边，叠成一条更粗更深的边。现在只保留 `::after` 这一层，并对彩色卡片开 / 关两种情况都生效。
+- **外观菜单的主题监听不清理**：`themeObserver` 只在 `beforeunload` 断开，每次热重载都残留一个。改为在 effect 的清理函数里断开。
+- **输入框守卫监听过宽**：原先监听 body 下所有属性变化，空闲 4 秒触发 24 次回调、303 条记录。改为只监听 `class` / `style` / `hidden` / `aria-selected` 和 claude-style 的两个输入框标记，同样场景降到 5 次、12 条。
+- **右栏选择器过宽**：`[data-sidebar-right-panel] [class*="pane"]` 会把 better-sidebar 的 pane 标签、diff / html 面板等一并去掉边框和背景。收窄为只匹配外框容器（`*_pane`、`paneCard`、`panelBody`、`paneContent`、`tabBody`）。
+- **浅色主题下「彩色卡片」开关打开时仍显示灰色**：浅色专用的灰底规则优先级更高，盖住了开启态的主题色。
+
+### 清理
+
+- mode 1 的外框 `::before` 不再先写一次侧栏玻璃再被覆盖。
+- 删除彩色卡片下两条不生效的 `prefers-reduced-transparency` 规则（目标元素本身没有 `backdrop-filter`）。
+
 ## [0.4.14] - 2026-11-14
 
 插件页卡片左上角恢复圆角。
