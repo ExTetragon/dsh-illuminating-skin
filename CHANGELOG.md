@@ -2,6 +2,16 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.4.13] - 2026-11-14
+
+彩色卡片开启时，主栏里的吸顶条不再是白色。
+
+### 修复
+
+- **阅读视图折叠条白底**：dsh-better-display 的折叠摘要行（`turnProcessSticky` / `closedProcessSummary` / `liveFoldContainer` 及其 `box-shadow` 补边）用 `--dsw-alias-bg-base` 铺不透明底，好让正文从下面滚过时被遮住。彩色卡片下卡片色是 `--is-card-fill`，而 bg-base 仍是宿主原值（浅色主题为纯白），于是折叠条成了白色横条。
+- **插件页顶部白底**：插件管理页吸顶头 `.V7pFBG_pageBar[data-natural]::before` 同样用 bg-base 铺底，问题相同。
+- 两处一并处理：彩色卡片开启时，在中栏内把 `--dsw-alias-bg-base` 指向 `--is-card-fill`。`--is-card-fill` 不读取 bg-base，不会循环引用。
+
 ## [0.4.12] - 2026-11-14
 
 DS-Bot 界面改为与默认界面一致的「一整块玻璃 + 一张卡片」渲染。
