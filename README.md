@@ -253,7 +253,8 @@ claude-style 激活时（`body[data-dsh-claude-style]`）本插件接管它的�
 
 - **强依赖 dsh-claude-style**：见文首前置要求。独立运行会退化。
 - **宿主升级后不再需要重查哈希**：0.4.9 起所有宿主元素都按语义属性定位（清单见「属性锚点清单」），DSH 升级不会再让浮层或卡片掉材质。仍带类名的只有第三方包（`IIa07q_shell` = dsh-mnemon、`nUhMVa_panelHost` = dshmarket、`bdiHEa_paneBody` / `nArs4W_paneCard` = dsh-better-sidebar）与语义后缀（`_centerCol` / `_sidebarCol` / `_frame` / `paneBody` 等）；前者由第三方包自己维护、版本锁定，后者后缀名不随哈希变。
-- **运行时只有切换器**：唯一的 JS 是顶部发光按钮的挂载与重挂（`MutationObserver` 只检查 `isConnected`，不轮询、不做布局测量）。因此不能自适应宿主新出现的自定义面板，新面板需要单独加规则。
+- **运行时只有切换器**：唯一的 JS 是顶部发光按钮的挂载与重挂（`MutationObserver` 只检查 `isConnected` 和 ds-bot 模式是否切换，不轮询、不做布局测量）。因此不能自适应宿主新出现的自定义面板，新面板需要单独加规则。
+- **ds-bot 适配按类名锚定**：bot 模式靠 ds-bot 自己的 `.bt-leftcol` / `.bt-head` 与 `--bt-*` 变量识别和改色，ds-bot 改名后这部分规则会静默失效，非 bot 模式不受影响。
 - **浅色主题未实测**：配对了一套浅色取值，但只在深色下验证过。
 - **彩色卡片是平涂色**：卡片不采样背景，侧栏玻璃的侧光不会渗进主栏，卡片左右两段观感一致；代价是没有「透出壁纸」的层次，只剩主题色调。要改明度调混合基色，要改色相调 `--is-card-tint`。
 

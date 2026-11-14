@@ -2,6 +2,31 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.4.12] - 2026-11-14
+
+DS-Bot 界面改为与默认界面一致的「一整块玻璃 + 一张卡片」渲染。
+
+### 修复
+
+- **根因**：bot 模式下 dsh-claude-style 会撤掉 `body[data-dsh-claude-style]`，皮肤落入 mode 1，外框 / 中栏 / header / 内容区四层玻璃叠在光晕上。bot 分支现在用 `BOTX`（`:not(#is-bot)` 提权）整体撤销这层叠加，并按 mode 2 重建单张主栏卡片。
+- **左栏、标题栏、窗口按钮色差**：`--bt-leftcol-fill` 与 body 上的 `--dsw-specific-sidebar-fill` 改为透明。宿主把后者测出来设成原生窗口按钮底色（`setTitleBarOverlay`），透明后按钮区与标题带连成一片；中栏内部仍还原为 bg-base。
+- **主栏多张宽度不同的卡片**：去掉 `[data-conversation-content]` 的 8px 卡片、header 玻璃带与输入框座位的填充，只保留中栏 `::before` 一张卡（彩色卡片开时用 `--is-card-fill`）和 ds-bot 自己的输入卡。
+- **外观按钮落在标题栏下方**：0.4.11 把按钮挂进 ds-bot header，而 header 带 `backdrop-filter`，`position:fixed` 以它为包含块，按钮落到 y≈46。bot 模式下改挂 `body`，固定在标题栏内、窗口按钮左侧。
+
+## [0.4.11] - 2026-11-14
+
+适配 ds-bot（团队外壳）模式：bot 模式下皮肤不再被它的浅色调色板和不透明条带盖掉。所有规则都以 `body:has(.bt-leftcol)` 为前提，退出 bot 模式即恢复原样。
+
+### 新增
+
+- **ds-bot 配色**：ds-bot 通过 `ctx.theme.overrideTokens()` 把宿主 `--dsw-*` 表面 token 改成自己的浅色值（窗口按钮因此变白），在 body 上按深 / 浅主题分别重申本皮肤的取值，并重配 ds-bot 自己的 `--bt-*` 调色板，让玻璃面板上的文字保持可读。
+- 去掉 ds-bot 画在居中标题胶囊背后的 60px 不透明渐变条；给被 ds-bot 改写的输入框补回 `--is-card-fill`，「彩色卡片」开关在 bot 模式下重新生效。
+- **切换器挂载**：bot 模式下宿主工具栏被挤成零宽，切换器改挂到 ds-bot 的 header 上并固定在右上角；`MutationObserver` 在进入 / 退出 bot 模式时重新选择挂载点。
+
+### 修复
+
+- 无 claude-style 时（例如 ds-bot）浅色主题下会话头仍是深色玻璃带，补上 `GLASS_LIGHT` 分支。
+
 ## [0.4.10] - 2026-11-14
 
 修复 0.4.9 引入的回归：主栏圆角卡片整体消失。
