@@ -2,6 +2,23 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.5.5] - 2026-11-21
+
+字体与字重改用「Google Sans Flex + Google Sans Code + Noto Sans SC」排版方案。字号不变。
+
+### 新增
+
+- **字体**：界面字体栈为 `"Google Sans Flex","Google Sans","Noto Sans SC",system-ui,…`，代码字体栈为 `"Google Sans Code","Noto Sans SC",ui-monospace,…`；同时写入 `--dsw-font-family` / `--dsh-font-family-text(-default)` / `--ds-font-family-code` / `--dsh-font-family-code(-default)`，claude-style 的字体变量也改为同一套。
+  - 页面 CSP 只允许 `font-src data:`（远程地址与插件目录文件实测 404），Google Sans Flex / Code 的拉丁子集以 base64 内嵌。Flex 用 fontTools 实例化：opsz 固定 18，保留 wdth 92–100、wght 100–1000、ROND 0–20、slnt −10–0，体积 1MB → 139KB。
+  - 中文使用本机思源黑体可变版（Noto Sans SC，wght 100–900），不内嵌。
+- **字重与可变轴**（排版块 T1）：正文 350、`"ROND" 0,"slnt" 0,"wdth" 92`、`no-contextual`、antialiased；h1/h2 550 + ROND 20 + wdth 100，h3–h6 550 + wdth 94；加粗 `max(600, 490)`（英文 wght 轴 490）；斜体用 slnt −10；代码恢复整数字重与 `font-variation-settings:normal`；图标字体不受影响。
+- **宿主字重换算**（`mountWeightMap()`）：运行时扫描页面样式表，把写死的字重换算到阶梯（300→250、400→350、500→450、600→550、700/bold→650、800/900→850），输出到放在 head 末尾的 `<style id="dsh-illuminating-skin-weights">`；样式表增删、改写或 `<link>` 加载时以 rAF 合并重新扫描。代码与图标规则跳过。
+- **表单控件**：`button` / `input` / `select` / `textarea` 继承正文的可变轴与连字设置（零特异性，只覆盖浏览器默认重置）。
+
+### 变更
+
+- 插件自身元素的字重按同一阶梯换算（品牌标签、编辑侧栏标题、外观提示、bot 标题胶囊、左栏分区标题）。
+
 ## [0.5.4] - 2026-11-15
 
 标题栏与左栏整理（独立模式、ds-bot 界面）。
