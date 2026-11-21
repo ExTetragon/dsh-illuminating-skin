@@ -2,6 +2,21 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.5.7] - 2026-11-21
+
+精简顶栏「更多对话视图（`···`）」溢出菜单、修复无插件 / 空白新会话时右上角按钮重叠，并补充市场展示截图。
+
+### 新增
+
+- **顶栏「更多对话视图（`···`）」精简与按需显隐**：
+  - 隐藏 `[role="menu"][class*="_viewsMoreMenu"]` 中由 `entry-customization` 注入的「浏览更多插件」「创建你的插件」及其上方分隔线（并兜底隐藏空菜单），左栏「更多」与右栏菜单完全不受影响。
+  - 新增第 9 个运行时 effect `mountViewsMore(ctx)`，对比 `slots.entries('conversation.view')`（联动 `configForms.developerTools.enabled` 是否启用 `trajectory`）与顶栏可见标签数量；全部视图均已展示时自动隐藏 `···`（`data-is-views-more-empty`），窗口变窄或视图溢出时即时恢复，独立模式 `mountHeaderBand()` 同步刷新 `--is-band-tabs-half`。
+- **市场展示截图**：新增 6 色顶部发光斜向叠放图（`assets/showcase-themes.png`）、完整对话主界面图（`assets/showcase-conversation.png`）与 `screenshots.json`。
+
+### 修复
+
+- **空白新会话 / 无第三方插件时右上角按钮重叠**：`findGlowHost()` 在无 `[class*="_headerUtilities"]` 时优先挂载至 `[data-conversation-header-corner]` 并追加到右栏开关右侧（保持 `8px` 间距并锁定 `.is-glow__chev` 为 `8×8px`），待 `_headerUtilities` 出现后自动迁回；`mountHeaderBand()` 同步为 `body > .is-glow` 保留右侧宽度兜底，避免外观圆点与右栏开关重叠。
+
 ## [0.5.6] - 2026-11-21
 
 统一独立模式与 `dsh-claude-style`（`cs` 模式）的 Windows 左上角品牌菜单与按钮组，补齐模式切换与顶栏搜索按钮，并移除与宿主重复的自建左栏入口收起（S3）。
