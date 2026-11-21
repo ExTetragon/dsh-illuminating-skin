@@ -2,6 +2,31 @@
 
 本项目遵循 [语义化版本](https://semver.org/lang/zh-CN/)。
 
+## [0.5.6] - 2026-11-21
+
+统一独立模式与 `dsh-claude-style`（`cs` 模式）的 Windows 左上角品牌菜单与按钮组，补齐模式切换与顶栏搜索按钮，并移除与宿主重复的自建左栏入口收起（S3）。
+
+### 新增
+
+- **标题栏接管扩展至 `dsh-claude-style`（`cs` 模式，Windows）**：
+  - Windows 非全屏下，左上角品牌标签（`.is-brand` + 「应用 / 编辑」原生下拉）与按钮组接管范围由独立模式扩展至 `cs` 模式，排列顺序为「品牌下拉 | 收起左栏 | 搜索 | 新会话」。
+  - 启用 `dsh-claude-style` 且处于 Windows 非全屏标题栏时，在「收起左栏」与「新会话」之间挂载搜索按钮（`.is-cs-search`，仅 `cs` 模式显示），点击调用 claude-style 的搜索面板；同时隐藏左栏内重复的 `.dsh-claude-search-trigger-icon` 所在入口与 `search-slot`（保留 DOM 可点击触发）。
+  - 抬升收起左栏、搜索、新会话三个按钮的层序至 `z-index: 45`（压过 claude-style 的顶栏层 `30` 与 `sidebar-peek` 悬停层 `40`），移除 claude-style 的旋转 `::before` 加号并恢复宿主 `16px` 新会话图标。
+  - 将 `cs` 下未展开的原生 `[data-windows-menu]` 锚定在三按钮右侧 `1px` 处并在布局变化时安全派发 `resize`，让 claude-style 的 `headerBand`（`menuRight`）自动避让三个按钮。
+- **品牌下拉首项模式切换（S2e / B3）**：仅在 `ds-bot` 插件运行时出现——普通与 `cs` 界面顶部新增「DS-Bot模式」（点击 `.bt-return` 切回 bot 界面）；bot 界面顶部新增「经典Agents模式」（驱动 ds-bot 账号菜单切回 Agent 界面，左栏收起时自动临时展开后点击）。
+
+### 变更
+
+- **新会话按钮移进标题栏（S2c，Windows）**：宿主 `button._newSession` 在展开 / 收起两态统一固定在标题栏内（独立模式位于 `+34px`，`cs` 模式位于 `+68px`），收起左栏前后位置不变，消除收起态下的错位重复按钮；独立模式会话标题左缘改对齐至新会话按钮右侧。
+- **移除 claude-style 的界面切换按钮**：隐藏左上角的 `.dsh-claude-surface-switch`，DS-Bot 与经典 Agent 切换统一收口到品牌下拉菜单首项。
+- **左栏顶部空隙对齐（S2d）**：`_newSessionRow` 高度与外边距归零消掉空行盒；展开态左栏首行距标题栏统一为 `12px`（独立模式 `padding-top: 0` + `4 + 8`，`cs` 模式显式 `padding-top: 12px`，与 `ds-bot` 一致）。
+- **统一顶栏按钮样式与悬浮提示（`.is-band-tip`）**：收起左栏、搜索、新会话三按钮统一 `28×28` 尺寸、圆角与悬停底色；插件补绘的悬浮提示改为单胶囊 `<kbd>` + `+` 结构，与宿主 `ShortcutKeys`（`Ctrl+X`）一致。
+- **移除插件自建左栏入口收起（S3）**：DSH 0.2.2-rc.5 已原生提供「从左侧栏取消固定」与「更多」菜单，移除 `mountPanelOverflow`、`.is-panels*` 样式与 `data-is-panel-hidden`；`apply()` 首次启动一次性清理历史 `dsh-illuminating-skin:sidebar-hidden` 缓存，运行时 effect 精简为 8 个。
+
+### 修复
+
+- **品牌按钮与下拉菜单字体**：`.is-brand` / `.is-brand-menu` / `.is-brand-menu__item` 强制使用 T1 字体栈，修复 `ds-bot` 界面「DS Bot」品牌按钮及下拉菜单文字回落系统字体的问题（注：「应用 / 编辑」二级菜单由主进程 `Menu.buildFromTemplate().popup()` 原生绘制，仍使用系统字体）。
+
 ## [0.5.5] - 2026-11-21
 
 字体与字重改用「Google Sans Flex + Google Sans Code + Noto Sans SC」排版方案。字号不变。
